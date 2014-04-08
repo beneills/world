@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include <math.h>
-// TODO why can't I get tis from math.h?
+// TODO why can't I get this from math.h?
 # define M_SQRT2	1.41421356237309504880	/* sqrt(2) */
 # define M_SQRT1_2	0.70710678118654752440	/* 1/sqrt(2) */
 # define M_PI		3.14159265358979323846	/* pi */
