@@ -1,9 +1,9 @@
 #ifndef GRAPHICS_H_INCLUDED
 #define GRAPHICS_H_INCLUDED
 
-#include "map.h"
+#include "world.h"
 
-char* map_render(map* m);
+char* world_render(world* w);
 
 #endif
 

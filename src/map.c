@@ -2,10 +2,11 @@
 #include "utility.h"
 
 map* map_new(unsigned int width, unsigned int height) {
-  map* m = SAFEMALLOC(sizeof(map));
+  map* m = (map *) SAFEMALLOC(sizeof(map));
   m->width = width;
   m->height = height;
-  m->data = SAFEMALLOC(height * width * sizeof(tile));
+  m->data = (tile *) SAFEMALLOC(height * width * sizeof(tile));
+  memset(m->data, MAP_EL_EMPTY, height * width * sizeof(tile));
   return m;
 }
 

@@ -11,8 +11,8 @@
 # define SQUARE(x) x*x
 
 #include "generate.h"
+#include "utility.h"
 
-#define uniform_random() ((double)rand()/(double)RAND_MAX)
 
 void seed_generator() {
   srand((unsigned) time(NULL));
@@ -20,18 +20,19 @@ void seed_generator() {
 
 seed* seeds_generate(unsigned int width,
 		     unsigned int height,
-		     unsigned int n) {
+		     unsigned int n,
+		     double (*initial_strength)()) {
   seed *c;
   seed *h = NULL;
   for (int i = 0; i < n; ++i) {
     // TODO use seeds_add
     c = (seed *) SAFEMALLOC(sizeof(seed));
 
-    // TODO this fails on edge case (literally)
+    // TODO this possibly fails on edge case (literally)
     c->x = (unsigned int) (uniform_random() * width);
     c->y = (unsigned int) (uniform_random() * height);
 
-    c->strength = initial_strength();
+    c->strength = (* initial_strength)();
     c->next = h;
     h = c;
   }
@@ -70,7 +71,7 @@ bool seeds_contains(seed* s,
   return false;
 }
 
-bool meets_cutoff(double p) {
+bool meets_cutoff_basic(double p) {
   // TODO
   if (p > 0.1) {
     return true;
@@ -80,31 +81,37 @@ bool meets_cutoff(double p) {
 }
 
 // used for the very first (parentless) seeds
-double initial_strength() {
+double initial_strength_basic() {
   return cos(uniform_random());
 }
 
 
-double derived_strength(double parent_strength) {
+double derived_strength_basic(double parent_strength) {
   // TODO
   // return parent_strength * 0.7;
   return SQUARE(cos(parent_strength * M_PI / 2.0));
 }
 
-//TODO testing
-int pool_size(seed *s) {
-  int n = 0;
-  for ( ; s != NULL; s = s->next ) {
-    ++n;
-  }
-  return n;
-}
-
 map* generate_random_map(unsigned int width,
 			 unsigned int height,
-			 unsigned int seeds) {
+			 unsigned int seeds,
+			 bool (*meets_cutoff)(double),
+			 double (*initial_strength)(),
+			 double (*derived_strength)(double)) {
+  // possibly use defaults
+  if ( meets_cutoff == NULL ) {
+    meets_cutoff = MEETS_CUTOFF_DEFAULT;
+  }
+  if ( initial_strength == NULL ) {
+    initial_strength = INITIAL_STRENGTH_DEFAULT;
+  }
+  if ( derived_strength == NULL ) {
+    derived_strength = DERIVED_STRENGTH_DEFAULT;
+  }
+
+
   map* m = map_new(width, height);
-  seed* s = seeds_generate(width, height, seeds);
+  seed* s = seeds_generate(width, height, seeds, initial_strength);
 
   // while seed pool is non-empty, take a seed from the front and process it
   // strength < 0 is used for an empty map square, but stops it being repeatedly
@@ -130,7 +137,10 @@ map* generate_random_map(unsigned int width,
 	     !seeds_contains(s, x, y) ) {
 	  // cases diagonal and non-diagonal
 	  double diagonal_multiplier = (d_x && d_y) ? 1.0 : M_SQRT2;
-	  double strength = meets_cutoff(uniform_random() * c->strength * diagonal_multiplier) ? derived_strength(c->strength) : -1.0;
+	  double strength = (* meets_cutoff)(uniform_random() *
+					     c->strength *
+					     diagonal_multiplier)
+	    ? (* derived_strength)(c->strength) : -1.0;
 	  // add to pool
 	  seeds_add(c, (unsigned int) x, (unsigned int) y, strength);
 	}
