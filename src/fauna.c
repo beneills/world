@@ -2,7 +2,9 @@
 
 #include "fauna.h"
 #include "utility.h"
+#include "world.h"
 
+// TODO accept world* param
 fauna* fauna_new(unsigned int map_width, unsigned int map_height, unsigned int x, unsigned int y) {
   fauna* f = (fauna *) SAFEMALLOC(sizeof(fauna));
   f->x = x;
@@ -13,8 +15,11 @@ fauna* fauna_new(unsigned int map_width, unsigned int map_height, unsigned int x
 }
 
 void fauna_free(fauna* f) {
-  free(f->explored);
-  free(f);
+  for ( fauna* tmp; f != NULL; f = tmp) {
+    tmp = f->next;
+    free(f->explored);
+    free(f);
+  }
 }
 
 // returns pointer to added fauna
