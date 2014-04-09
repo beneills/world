@@ -19,8 +19,7 @@ dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra $(OPTFLAGS)
 dev: all
 
 $(TARGET): build $(OBJECTS)
-	echo gcc $(CFLAGS) -o $@ $(SOURCES) $(LIBS) && echo "BUILD SUCCESS"
-	gcc $(CFLAGS) -o $@ $(SOURCES) $(LIBS)&& echo "BUILD SUCCESS"
+	gcc $(CFLAGS) -o $@ $(SOURCES) $(LIBS) && echo ">> BUILD SUCCESS"
 
 build:
 	@mkdir -p build
