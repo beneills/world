@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_H_INCLUDED
-#define GRAPHICS_H_INCLUDED
+#ifndef GENERATE_H_INCLUDED
+#define GENERATE_H_INCLUDED
 
 #include "map.h"
 #include "utility.h"
@@ -16,6 +16,13 @@ typedef struct seed_s {
   double strength;
   struct seed_s* next;
 } seed;
+
+// TODO use
+typedef struct {
+  bool (*meets_cutoff)(double);
+  double (*initial_strength)();
+  double (*derived_strength)(double);
+} map_generation_parameters;
 
 void seed_generator();
 seed* seeds_generate(unsigned int width,
