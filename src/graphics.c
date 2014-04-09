@@ -9,8 +9,8 @@ char* world_render(world* w) {
 
   // count tiles, newlines and terminating NULL
   int bytes = m->height * (m->width + 1) + 1;
-  char* output = (char *) SAFEMALLOC(bytes * sizeof(char));
-  memset(output, '\0', bytes);
+  char* output = (char *) SAFECALLOC(bytes, sizeof(char));
+
   int j = 0; // output string position
   for ( unsigned int i = 0; i < m->height * m->width; ++i, ++j ) {
     if (i > 0 && index_to_x(m, i) == 0) {
