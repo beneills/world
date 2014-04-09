@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "generate.h"
 #include "graphics.h"
 #include "map.h"
@@ -20,7 +23,8 @@ int main(int argc, char** argv) {
   w->f = fauna_generate(m, 10);
 
   char* output = world_render(w);
-  printf(output);
+
+  puts(output);
   free(output);
   printf("\n");
 

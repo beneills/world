@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "map.h"
 #include "utility.h"
 

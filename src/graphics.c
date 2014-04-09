@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "fauna.h"
 #include "graphics.h"
 #include "map.h"
