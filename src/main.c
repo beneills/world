@@ -9,9 +9,9 @@ int main(int argc, char** argv) {
 
   printf("Generating map.\n");
 
-  map *m = generate_random_map(100, 40, 15, NULL, NULL, NULL);
+  map* m = generate_random_map(100, 40, 15, NULL, NULL, NULL);
 
-  world *w = world_new(m);
+  world* w = world_new(m);
 
   /* fauna *f = fauna_new(w->m->width, w->m->height, 0, 0); */
   /* fauna_add(w->m->width, w->m->height, f, 0, 1); */
@@ -19,8 +19,9 @@ int main(int argc, char** argv) {
 
   w->f = fauna_generate(m, 10);
 
-  char * output = world_render(w);
+  char* output = world_render(w);
   printf(output);
+  free(output);
   printf("\n");
 
   printf("Freeing world.\n");

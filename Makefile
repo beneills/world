@@ -1,7 +1,7 @@
 # Based on http://c.learncodethehardway.org/book/ex28.html
 
-CFLAGS=-std=c99
-# -g -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
+CFLAGS=-std=c99 -g
+# -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
 LIBS=-ldl -lm
 PREFIX?=/usr/local
 

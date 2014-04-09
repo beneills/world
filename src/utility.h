@@ -15,6 +15,6 @@ typedef enum { false, true } bool;
 
 void* safe_malloc(size_t n, unsigned long line);
 
-#define SAFEMALLOC(n) safe_malloc(n, __LINE__)
+#define SAFEMALLOC(n) safe_malloc((n), __LINE__)
 
 #endif

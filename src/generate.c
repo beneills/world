@@ -41,7 +41,7 @@ seed* seeds_generate(unsigned int width,
 }
 
 seed* seeds_free(seed* s) {
-  for ( seed* c; c != NULL;  s = c) {
+  for ( seed* c = s; c != NULL;  s = c) {
     c = s->next;
     free(s);
   }

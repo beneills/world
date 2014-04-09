@@ -8,7 +8,9 @@ char* world_render(world* w) {
   map* m = w->m;
 
   // count tiles, newlines and terminating NULL
-  char* output = SAFEMALLOC((m->height * (m->width + 1) + 1) * sizeof(char));
+  int bytes = m->height * (m->width + 1) + 1;
+  char* output = (char *) SAFEMALLOC(bytes * sizeof(char));
+  memset(output, '\0', bytes);
   int j = 0; // output string position
   for ( unsigned int i = 0; i < m->height * m->width; ++i, ++j ) {
     if (i > 0 && index_to_x(m, i) == 0) {
@@ -21,5 +23,6 @@ char* world_render(world* w) {
       output[j] = m->data[i] == MAP_EL_IMPASSABLE ? 'X' : ' ';
     }
   }
+  output[bytes-1] = '\0';
   return output;
 }
