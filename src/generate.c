@@ -82,7 +82,7 @@ bool meets_cutoff_basic(double p) {
 
 // used for the very first (parentless) seeds
 double initial_strength_basic() {
-  return cos(uniform_random());
+  return cos(uniform_random()); // TODO factor of pi?
 }
 
 
