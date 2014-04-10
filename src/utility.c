@@ -26,3 +26,13 @@ void* safe_calloc(size_t num, size_t size, unsigned long line) {
   return p;
 }
 
+void* safe_realloc(void* p, size_t n, unsigned long line) {
+  p = realloc(p, n);
+  if (!p)
+    {
+      fprintf(stderr, "[%s:%u]Out of memory(%u bytes)\n",
+	      __FILE__, (unsigned int)line, (unsigned int)n);
+      exit(EXIT_FAILURE);
+    }
+  return p;
+}
