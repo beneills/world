@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define uniform_random() ((double)rand()/(double)RAND_MAX)
 #define integer_uniform_random(n) ((unsigned int) (uniform_random() * n))
