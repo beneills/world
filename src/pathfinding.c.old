@@ -1,0 +1,152 @@
+//
+// Basic A* algorithm written after reading http://www.policyalmanac.org/games/aStarTutorial.htm
+// TODO: fauna only consider local and explored areas, without global omniscience
+//
+
+#include "pathfinding.old.h"
+
+node* pathfind(map* m,
+		 unsigned int (*heuristic)(unsigned int x1,
+					     unsigned int y1,
+					     unsigned int x2,
+					     unsigned int y2),
+		 unsigned int start_x, unsigned int start_y,
+		 unsigned int end_x, unsigned int end_y) {
+  // TODO error check
+
+  // initialize open list with starting square
+  node_list* open_list = node_list_add(start_x, start_y,
+					     0, (*heuristic)(start_x,
+							     start_y,
+							     end_x,
+							     end_y),
+					     NULL, NULL);
+  
+  // initialize closed list empty
+  node_list* closed_list = NULL;
+
+  // consume the lowest f-value item from the start of the list
+  node_list* tmp = open_list;
+  open_list = open_list->next;
+  
+  // TODO add to closed
+  node_list_add(tmp->x, tmp->y,
+		   0, 0, // we don't care about g or h values at this stage
+		   tmp->parent, closed_list);
+
+  for ( int d_x = -1; d_x < 2; ++d_x ) {
+    for ( int d_y = -1; d_y < 2 && (d_x != 0 || d_y != 0); ++d_y ) {
+      	int x = x + d_x;
+	int y = y + d_y;
+	
+
+	if ( x >= 0 && x < m->width &&
+	     y >= 0 && y < m->height &&
+	     map_element(m, x, y) == MAP_EL_EMPTY &&
+	     node_list_contains(x, y, closed_list)) {
+
+	  // calculate the "immediate" g-value with tmp as parent
+	  unsigned int diagonal_value = (d_x && d_y) ? 14 : 10;
+	  unsigned int immediate_g = tmp->g + diagonal_value;
+
+
+	  // calculate h
+	  unsigned int h = (*heuristic)(x, y, end_x, end_y);
+
+	  node_list* tmp2;
+	  if ( tmp2 = node_list_contains(x, y, open_list) &&
+	       immediate_g < tmp2->g ) {
+	    tmp2->parent = tmp;
+	    tmp2->g = immediate_g;
+	    // TODO reorder list
+	  } else {
+	    // add to open list
+	    node_list_add(x, y,
+			     immediate_g, h,
+			     tmp, open_list);
+	  }
+
+
+	  // set parent
+
+	  // add to open list
+	  
+
+  free(tmp);
+  
+}
+
+node_list* node_list_add(unsigned int x,
+			 unsigned int y,
+			 unsigned int g,
+			 unsigned int h,
+			 node_list* parent,
+			 node_list* head) {
+  node_list* p = (node_list *) SAFEMALLOC(sizeof(node_list));
+  p->x = x;
+  p->y = y;
+  p->g = g;
+  p->h = h;
+  p->parent = parent;
+  if (head != NULL) { // insert at correct position, if not first
+    for ( ;
+	  head->next != NULL && (head->g + head->h) < g + h; //TODO check
+	  head = head->next )
+      ; // intentionally left blank
+    p->next = head;
+    p->prev = head->prev;
+    head->prev = p;
+  } else { // if first
+    p->prev = NULL;
+    p->next = NULL;
+  }
+  return p;
+}
+
+ void node_list_free(node_list* head) {
+   head = head->next;
+   for ( ; head->next != NULL; head = head->next) {
+     free(head->prev);
+   }
+   free(head);
+ }
+
+// checks coordinates, not memory addresses
+// returns the node, or NULL
+// TODO possible speedup if we also have quick add function
+// TODO stop checking when f value is too big
+node_list* node_list_contains(unsigned int x,
+			      unsigned int y,
+			      node_list* head) {
+  for ( ;
+	head != NULL && (head->x != x || head->y != y);
+	head = head->next )
+    ; // intentionally left blank
+  return head;
+}
+
+// reposition a node whose g-value has been set lower,
+// to maintain order
+void node_list_reposition(node_list* p) {
+  // take out of LL
+  p->prev->next = p->next;
+  p->next->prev = p->prev;
+
+  // and place back in
+  node_list* tmp = p;
+  for ( ;
+	tmp->prev != NULL && tmp->g + tmp->h > g + h; //TODO check
+	tmp = tmp->prev )
+    ; // intentionally left blank
+  tmp->next->prev = p;
+  p->next = tmp->next;
+  p->prev = tmp;
+  tmp->next = p;
+}
+
+unsigned int manhattan_heuristic (unsigned int x1,
+				  unsigned int y1,
+				  unsigned int x2,
+				  unsigned int y2) {
+  return (x2 - x1) + (y2 - y1);
+}

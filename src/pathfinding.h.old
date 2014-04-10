@@ -1,0 +1,53 @@
+#ifndef PATHFINDING_H_INCLUDED
+#define PATHFINDING_H_INCLUDED
+
+#include "map.h"
+
+//
+// TODO problem is that head may not point to head of list
+//
+
+// maintained with ascending F = G + H  values
+typedef struct node_list_s {
+  unsigned int x, y;
+  unsigned int g, h;
+  struct node_list_s* parent;
+  struct node_list_s* prev;
+  struct node_list_s* next;
+} node_list;
+
+// DONE
+node_list* node_list_add(unsigned int x,
+			 unsigned int y,
+			 unsigned int g,
+			 unsigned int h,
+			 node_list* parent,
+			 node_list* head);
+
+// DONE
+void node_list_free(node_list* head);
+
+// DONE
+node_list* node_list_contains(unsigned int x,
+			      unsigned int y,
+			      node_list* head);
+
+// DONE
+void node_list_reposition(node_list* p);
+
+// TODO
+node* pathfind(map* m,
+	       unsigned int (*heuristic)(unsigned int x1,
+					 unsigned int y1,
+					 unsigned int x2,
+					 unsigned int y2),
+	       unsigned int start_x, unsigned int start_y,
+	       unsigned int end_x, unsigned int end_y);
+
+unsigned int manhattan_heuristic (unsigned int x1,
+				  unsigned int y1,
+				  unsigned int x2,
+				  unsigned int y2);
+
+#endif
+

@@ -1,7 +1,4 @@
 #ifndef PATHFINDING_H_INCLUDED
 #define PATHFINDING_H_INCLUDED
 
-
-
 #endif
-
