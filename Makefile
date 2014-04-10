@@ -1,7 +1,7 @@
 # Based on http://c.learncodethehardway.org/book/ex28.html
 
-CFLAGS=-std=c99 -g
-# -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
+CFLAGS=-std=c99 -g -Isrc
+# -Wall -Wextra -rdynamic -DNDEBUG $(OPTFLAGS)
 LIBS=-ldl -lm
 PREFIX?=/usr/local
 
@@ -24,9 +24,11 @@ $(TARGET): build $(OBJECTS)
 build:
 	@mkdir -p build
 
-# The Unit Tests
+# tests
+$(TESTS):
+	gcc $(CFLAGS) -o $@ $(@).c $(LIBS)
+
 .PHONY: tests
-tests: CFLAGS += $(TARGET)
 tests: $(TESTS)
 	sh ./tests/runtests.sh
 
@@ -50,3 +52,6 @@ BADFUNCS='[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?
 check:
 	@echo Files with potentially dangerous functions.
 	@egrep $(BADFUNCS) $(SOURCES) || true
+
+check-syntax:
+	gcc -o build/nul -S ${CHK_SOURCES}
