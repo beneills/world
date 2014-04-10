@@ -18,6 +18,7 @@ void fauna_free(fauna* f) {
   for ( fauna* tmp; f != NULL; f = tmp) {
     tmp = f->next;
     free(f->explored);
+    free(f->ws);
     free(f);
   }
 }

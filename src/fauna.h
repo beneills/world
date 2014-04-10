@@ -2,6 +2,7 @@
 #define FAUNA_H_INCLUDED
 
 #include "map.h"
+#include "wander.h"
 
 // maximum number of tries before giving up
 #define FAUNA_GENERATE_MAX 10000
@@ -9,6 +10,7 @@
 typedef struct fauna_s {
   unsigned int x, y; // position
   char* explored; // known places on map
+  wander_status* ws;
   struct fauna_s* next;
 } fauna;
 
