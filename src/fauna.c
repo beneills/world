@@ -3,93 +3,77 @@
 
 #include "fauna.h"
 #include "utility.h"
-#include "wander.h"
-#include "world.h"
 
-// TODO accept world* param
-fauna* fauna_new(unsigned int map_width, unsigned int map_height, unsigned int x, unsigned int y) {
+
+// return new fauna object, sensibly initialized
+fauna* fauna_new(world* w, node spawn_node) {
   fauna* f = (fauna *) SAFEMALLOC(sizeof(fauna));
-  f->x = x;
-  f->y = y;
+
+  // base members
+  f->position = spawn_node;
+  f->born = 0;
+  f->explored = (char *)
+    SAFEMALLOC(sizeof(char) * w->m->width * w->m->height);
+
+  // module members
+  f->genes = (gene_attributes *)
+    SAFEMALLOC(sizeof(gene_attributes));
+  f->status = (status_attributes *)
+    SAFEMALLOC(sizeof(status_attributes));
+
+  // data structure
   f->next = NULL;
-  f->explored = (char *) SAFEMALLOC(sizeof(char) * map_width * map_height);
+
   return f;
 }
 
+// free ONE fauna object's memory
 void fauna_free(fauna* f) {
-  for ( fauna* tmp; f != NULL; f = tmp) {
-    tmp = f->next;
-    free(f->explored);
-    free(f->ws);
-    free(f);
+  free(f->explored);
+  free(f->genes);
+  free(f->status);
+  free(f);
+}
+
+// remove ONE fauna object
+// TODO test
+void fauna_remove(fauna *head, fauna *f) {
+  for ( ; head->next != f; head = head->next ) {}
+  head->next = f->next;		/* patch up the chain */
+  fauna_free(f);
+}
+
+// remove entire fauna list
+// TODO test
+void fauna_remove_all(fauna* head) {
+  for ( fauna* tmp = head->next;
+	head != NULL;
+	head = tmp, tmp = head->next ) {
+    fauna_free(head);
   }
 }
 
-// returns pointer to added fauna
-// starts new list if passed NULL
-fauna* fauna_add(unsigned int map_width, unsigned int map_height, fauna* head, unsigned int x, unsigned int y) {
-  fauna* f = fauna_new(map_width, map_height, x, y);
+// add a fauna to end of list and return it
+// if head == NULL, we start a new list seamlessly
+// TODO test
+fauna* fauna_add(fauna* head, world* w, node spawn_node) {
+  fauna* f = fauna_new(w, spawn_node);
   if ( head != NULL ) {
-    for ( ; head->next != NULL; head = head->next ){}
+    for ( ; head->next != NULL; head = head->next )
+      ;				/* intentionally blank */
     head->next = f;
   }
   return f;
 }
 
-void fauna_remove(fauna *head, fauna *f) {
-  for ( ; &head->next != &f; head = head->next ) {}
-  head->next = f->next;
-  fauna_free(f);
-}
-
-// returns NULL if not found
-fauna* fauna_at(fauna* head, unsigned int x, unsigned int y) {
+// return the first fauna found in list with given position,
+//   starting at search_start
+// returns NULL if no such fauna exists in list
+// TODO test
+fauna* fauna_at(fauna* search_start, node position) {
   for ( ;
-	head != NULL && ( head->x != x || head->y != y );
-	head = head->next ) {}
-  return head;
-}
-
-// tries to place n fauna on random empty tiles
-// but may place some or all (may return NULL)
-fauna* fauna_generate(map* m, unsigned int n) {
-  fauna* head = NULL;
-  fauna* tmp;
-  for ( int i = 0,
-	  successes = 0,
-	  x = 0,
-	  y = 0;
-	i < FAUNA_GENERATE_MAX &&
-	  successes < n;
-	++i ) {
-    x = integer_uniform_random(m->width);
-    y = integer_uniform_random(m->height);
-
-    if ( map_element(m, x, y) == MAP_EL_EMPTY ) {
-      attributes a;
-      a.reproducibility = uniform_random();
-      tmp = fauna_add(m->width, m->height, head, x, y);
-      tmp->attr = a;
-      if ( head == NULL ) { head = tmp; } // set head only once
-      ++successes;
-    }
-  }
-  return head;
-}
-
-fauna* fauna_reproduce(unsigned int map_width,
-		       unsigned int map_height,
-		       fauna* head,
-		       fauna* f1,
-		       fauna* f2) {
-  assert(f1->x == f2->x);
-  assert(f1->y == f2->y);
-  
-  // TODO perturb
-  fauna* child = fauna_add(map_width, map_height, head, f1->x, f1->y);
-  attributes a;
-  a.reproducibility = (f1->attr.reproducibility + f2->attr.reproducibility)/2;
-  child->attr = a;
-  child->ws = wander_status_random();
-  return child;
+	search_start != NULL &&
+	  !NODE_EQ(search_start->position, position);
+	search_start = search_start->next ) {}
+  return search_start;
 }
