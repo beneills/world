@@ -45,7 +45,7 @@ node wander(map* m,
     .x = f->x,
     .y = f->y
   };
-
+  debug("1\n");
   for ( unsigned int i = 0; i < WANDER_MAX_PERTURBATION_ATTEMPTS; ++i ) {
     perturbed_angle = (*params->perturb_angle)(s->angle);
     n = node_from_angle(current, perturbed_angle);

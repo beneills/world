@@ -7,9 +7,14 @@
 // maximum number of tries before giving up
 #define FAUNA_GENERATE_MAX 10000
 
+typedef struct {
+  double reproducibility;
+} attributes;
+
 typedef struct fauna_s {
   unsigned int x, y; // position
   char* explored; // known places on map
+  attributes attr;
   wander_status* ws;
   struct fauna_s* next;
 } fauna;

@@ -1,7 +1,9 @@
+#include <assert.h>
 #include <stdlib.h>
 
 #include "fauna.h"
 #include "utility.h"
+#include "wander.h"
 #include "world.h"
 
 // TODO accept world* param
@@ -64,10 +66,30 @@ fauna* fauna_generate(map* m, unsigned int n) {
     y = integer_uniform_random(m->height);
 
     if ( map_element(m, x, y) == MAP_EL_EMPTY ) {
+      attributes a;
+      a.reproducibility = uniform_random();
       tmp = fauna_add(m->width, m->height, head, x, y);
+      tmp->attr = a;
       if ( head == NULL ) { head = tmp; } // set head only once
       ++successes;
     }
   }
   return head;
+}
+
+fauna* fauna_reproduce(unsigned int map_width,
+		       unsigned int map_height,
+		       fauna* head,
+		       fauna* f1,
+		       fauna* f2) {
+  assert(f1->x == f2->x);
+  assert(f1->y == f2->y);
+  
+  // TODO perturb
+  fauna* child = fauna_add(map_width, map_height, head, f1->x, f1->y);
+  attributes a;
+  a.reproducibility = (f1->attr.reproducibility + f2->attr.reproducibility)/2;
+  child->attr = a;
+  child->ws = wander_status_random();
+  return child;
 }
