@@ -4,6 +4,9 @@
 #include "wander.h"
 #include "world.h"
 
+#define FAUNA_NODE_UNEXPLORED 0x00
+#define FAUNA_NODE_EXPLORED 0x01
+
 typedef struct {
   double reproducibility;
 } gene_attributes;

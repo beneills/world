@@ -14,6 +14,7 @@ fauna* fauna_new(world* w, node spawn_node) {
   f->born = 0;
   f->explored = (char *)
     SAFEMALLOC(sizeof(char) * w->m->width * w->m->height);
+  // TODO explored set spawn_node
 
   // module members
   f->genes = (gene_attributes *)
@@ -83,4 +84,5 @@ fauna* fauna_at(fauna* search_start, node position) {
 // TODO test
 void fauna_move(fauna* f, node n) {
   f->position = n;
+  // TODO explored
 }
