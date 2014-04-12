@@ -1,6 +1,6 @@
 #include "minunit.h"
-#include "utility.c"
-#include "wander.c"
+#include "utility.h"
+#include "wander.h"
 
 char *test_wander()
 {

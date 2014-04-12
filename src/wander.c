@@ -1,8 +1,5 @@
 #include <math.h>
 
-#include "fauna.h"
-#include "map.h"
-#include "utility.h"
 #include "wander.h"
 
 // moves fauna to next node and returns that node
@@ -15,12 +12,12 @@ node wander(world* w,
 	i < WANDER_MAX_PERTURBATION_ATTEMPTS;
 	++i ) {
     // calculate a perturbed angle and corresponding (valid) node
-    perturbed_angle = (*params->perturb_angle)(f->status->wander);
-    n = node_from_angle(f->position, perturbed_angle);
+    perturbed_angle = (*params->perturb_angle)(f->status->wander->angle);
+    n = node_from_angle(w->m, f->position, perturbed_angle);
 
     // if this node is viable, move the fauna
-    if ( MAP_ELEMENT(m, n.x, n.y) == MAP_EL_EMPTY ) {
-      f->status->wander->angle = (*params->derived_angle)(s->angle,
+    if ( MAP_ELEMENT(w->m, n.x, n.y) == MAP_EL_EMPTY ) {
+      f->status->wander->angle = (*params->derived_angle)(f->status->wander->angle,
 							  perturbed_angle);
       fauna_move(f, n);
       break;
@@ -46,9 +43,11 @@ node node_from_angle(map* m,
     1;
 
   if ( MAP_NODE_VALID(m, current.x + dx, current.y + dy) ) {
-    return {.x = (unsigned int) (current.x + dx),
-	.y = (unsigned int) (current.y + dy)
-	};
+    // TODO
+    node n = {.x = (unsigned int) (current.x + dx),
+	      .y = (unsigned int) (current.y + dy)
+    };
+    return n;
   }
 
   return current;		/* default */
@@ -76,7 +75,7 @@ node wander_basic(world* w,
 // uniform perturbation
 // TODO use sensible distribution
 double perturb_angle_basic(double angle) {
-  double perturbation = uniform_random() * 2 * M_PI - M_PI;
+  double perturbation = UNIFORM_RANDOM() * 2 * M_PI - M_PI;
   return angle + perturbation;
 }
 

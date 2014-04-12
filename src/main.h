@@ -5,11 +5,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "fauna.h"
-#include "generate.h"
-#include "graphics.h"
-#include "map.h"
-#include "wander.h"
+#include "generate_map.h"
+#include "generate_fauna.h"
 #include "world.h"
 
 #endif

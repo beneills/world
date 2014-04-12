@@ -31,10 +31,12 @@ fauna* fauna_new(world* w, node spawn_node) {
 
 // free ONE fauna object's memory
 void fauna_free(fauna* f) {
-  free(f->explored);
-  free(f->genes);
-  free(f->status);
-  free(f);
+  if ( f != NULL ) {
+    free(f->explored);
+    free(f->genes);
+    free(f->status);
+    free(f);
+  }
 }
 
 // remove ONE fauna object
@@ -94,10 +96,9 @@ fauna* fauna_reproduce(world* w,
 		       fauna* head,
 		       fauna* f1,
 		       fauna* f2) {
-  assert(f1->x == f2->x);
-  assert(f1->y == f2->y);
+  assert( NODE_EQ(f1->position, f2->position) );
 
-  fauna* child = fauna_add(head, w, f1->x, f1->y);
+  fauna* child = fauna_add(head, w, f1->position);
 
   // TODO perturb
 

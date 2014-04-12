@@ -1,5 +1,4 @@
 #include <stdlib.h>
-
 #include "utility.h"
 
 // http://stackoverflow.com/questions/16297142/safe-malloc-realloc-wrapping-the-call-into-a-macro

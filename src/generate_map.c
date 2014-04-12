@@ -1,13 +1,15 @@
 #include "generate_map.h"
 
+#include "types.h"
+
 map* generate_random_map(unsigned int width,
 			 unsigned int height,
 			 unsigned int seeds,
-			 generation_parameters* params) {
+			 const generation_parameters* params) {
   map* m = map_new(width, height);
   seed* head = seeds_generate(width, height, seeds, params);
 
-  seeds_grow(s, params);
+  seeds_grow(head, params);
 
   for ( seed* s = head;
 	s != NULL;

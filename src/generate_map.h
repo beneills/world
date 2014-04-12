@@ -7,7 +7,7 @@
 map* generate_random_map(unsigned int width,
 			 unsigned int height,
 			 unsigned int seeds,
-			 generation_parameters* params);
+			 const generation_parameters* params);
 map* generate_random_map_basic(unsigned int width,
 			       unsigned int height,
 			       unsigned int seeds);

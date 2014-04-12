@@ -1,3 +1,5 @@
+#include "loop.h"
+
 void loop(world* w) {
   char* output;
 

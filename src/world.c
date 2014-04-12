@@ -7,6 +7,8 @@
 // allocate a new world object
 world* world_new() {
   world* w = (world *) SAFECALLOC(1, sizeof(world));
+  w->m = NULL;
+  w->f = NULL;
   return w;
 }
 

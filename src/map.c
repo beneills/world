@@ -13,6 +13,8 @@ map* map_new(unsigned int width, unsigned int height) {
 }
 
 void map_free(map* m) {
-  free(m->data);
-  free(m);
+  if ( m != NULL ) {
+    free(m->data);
+    free(m);
+  }
 }

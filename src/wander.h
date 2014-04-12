@@ -1,12 +1,15 @@
 #ifndef WANDER_H_INCLUDED
 #define WANDER_H_INCLUDED
 
-#define WANDER_MAX_PERTURBATION_ATTEMPTS 10 /* necessary for singly disconnected nodes  */
-#define RE_3_PI_I_8 0.3826834323650897717284599840303988667613445624856270414338 /* Re{e^{3pi/8}} */
+#include "fauna.h"
+#include "map.h"
+#include "types.h"
+#include "utility.h"
+#include "world.h"
 
-typedef struct {
-  double angle;			/* radians, in [0, 2pi) */
-} wander_status;
+#define WANDER_MAX_PERTURBATION_ATTEMPTS 10 /* necessary for singly disconnected nodes  */
+#define M_PI		3.14159265358979323846	/* pi */
+#define RE_3_PI_I_8 0.3826834323650897717284599840303988667613445624856270414338 /* Re{e^{3pi/8}} */
 
 typedef struct {
   double (*perturb_angle)(double);
