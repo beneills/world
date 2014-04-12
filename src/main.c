@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include "fauna.h"
-#include "generate.h"
-#include "graphics.h"
-#include "map.h"
-#include "wander.h"
-#include "world.h"
-
+#include "main.h"
 
 void reproduce(world* w) {
   fauna* f1;
@@ -45,50 +35,17 @@ void reproduce(world* w) {
 
 
 void test() {
-  printf("Generating map.\n");
 
-  map* m = generate_random_map(4, 4, 0, NULL, NULL, NULL);
-  world* w = world_new(m);
-
-  w->f = fauna_generate(m, 2);
-
-  char* output;
-
-  // set random statuses
-  for ( fauna* f = w->f;
-	f != NULL;
-	f = f->next ) {
-    f->ws = wander_status_random();
-  }
-
-  // run at 1hz
-  do {
-    reproduce(w);
-    output = world_render(w);
-    printf("\e[1;1H\e[2J");
-    puts(output);
-    printf("\n");
-    for ( fauna* f = w->f;
-	  f != NULL;
-	  f = f->next ) {
-      printf("wander");
-      fflush(stdout);
-      wander_basic(w->m, f->ws, f);
-      printf("...done\n");
-    }
-    sleep(1);
-  } while ( true );
-
-  free(output);
-
-
-  printf("Freeing world.\n");
-  world_free(w);
 }
 
 
 int main(int argc, char** argv) {
-  seed_generator();
-  test();
+  init_generator();		/* init PRNG */
+  world* w = world_new();	/* create a world */
+  w->map = generate_random_map_basic(30, 30, 5); /* create random map */
+  w->f = fauna_generate(w, 5);			 /* generate some fauna */
+
+
+  world_free(w);		/* free everything */
   return EXIT_SUCCESS;
 }
