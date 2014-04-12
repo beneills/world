@@ -21,6 +21,7 @@ fauna* fauna_new(world* w, node spawn_node) {
     SAFEMALLOC(sizeof(gene_attributes));
   f->status = (status_attributes *)
     SAFEMALLOC(sizeof(status_attributes));
+  // TODO init these?
 
   // data structure
   f->next = NULL;
@@ -85,4 +86,20 @@ fauna* fauna_at(fauna* search_start, node position) {
 void fauna_move(fauna* f, node n) {
   f->position = n;
   // TODO explored
+}
+
+
+// add a new child fauna to the list and return it
+fauna* fauna_reproduce(world* w,
+		       fauna* head,
+		       fauna* f1,
+		       fauna* f2) {
+  assert(f1->x == f2->x);
+  assert(f1->y == f2->y);
+
+  fauna* child = fauna_add(head, w, f1->x, f1->y);
+
+  // TODO perturb
+
+  return child;
 }

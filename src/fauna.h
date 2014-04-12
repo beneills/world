@@ -38,5 +38,8 @@ void fauna_remove_all(fauna* head);
 fauna* fauna_add(fauna* head, world* w, node spawn_node);
 fauna* fauna_at(fauna* head, node position);
 void fauna_move(fauna* f, node n);
-
+fauna* fauna_reproduce(world* w,
+		       fauna* head,
+		       fauna* f1,
+		       fauna* f2);
 #endif
