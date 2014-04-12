@@ -1,52 +1,64 @@
 #ifndef GENERATE_H_INCLUDED
 #define GENERATE_H_INCLUDED
 
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include "map.h"
 #include "utility.h"
 
-#define MEETS_CUTOFF_DEFAULT &meets_cutoff_basic
-#define INITIAL_STRENGTH_DEFAULT &initial_strength_basic
-#define DERIVED_STRENGTH_DEFAULT &derived_strength_basic
+#define NULL_STRENGTH -10.0
+#define VALID_STRENGTH(str) ((str) > NULL_STRENGTH/2)
 
-
-// linked list of seeds
 typedef struct seed_s {
-  unsigned int x;
-  unsigned int y;
-  double strength;
+  int x, y;			/* we allow seeds off the map */
+  double strength;		/* -1 strength signifies null seed */
   struct seed_s* next;
 } seed;
 
-// TODO use
-typedef struct {
+typedef struct {		/* TODO use */
   bool (*meets_cutoff)(double);
+  bool (*open_node)(int, int);
   double (*initial_strength)();
   double (*derived_strength)(double);
-} map_generation_parameters;
+} generation_parameters;
 
-void seed_generator();
+extern const generation_parameters basic_params = {
+  .meets_cutoff = &meets_cutoff_basic,
+  .open_node = &open_node_basic,
+  .initial_strength = &initial_strength_basic,
+  .derived_strength = &derived_strength_basic
+};
+
+extern const generation_parameters null_params = {
+  .meets_cutoff = NULL,
+  .open_node = NULL,
+  .initial_strength = &initial_strength_unit,
+  .derived_strength = NULL
+};
+
+// public functions
+void init_generator();
+seed* seeds_add(seed* head,
+		unsigned int x,
+		unsigned int y,
+		double strength);
+void seeds_free(seed* head);
 seed* seeds_generate(unsigned int width,
 		       unsigned int height,
 		       unsigned int n,
-		       double (*initial_strength)());
-seed* seeds_free(seed* s);
-void seeds_add(seed* s,
-	       unsigned int x,
-	       unsigned int y,
-	       double strength);
-bool seeds_contains(seed* s,
+		       generation_parameters* params);
+void seeds_grow(seed* head, generation_parameters* params);
+bool seeds_contains(seed* head,
 		    unsigned int x,
 		    unsigned int y);
-bool meets_cutoff_basic(double p);
-double initial_strength_basic();
-double derived_strength_basic(double parent_strength);
-
-map* generate_random_map(unsigned int width,
-			   unsigned int height,
-			   unsigned int seeds,
-			   bool (*meets_cutoff)(double),
-			   double (*initial_strength)(),
-			   double (*derived_strength)(double));
-
+double initial_strength_unit();
 #endif
 
+
+// TODO move?
+// maximum number of tries before giving up
+#define FAUNA_GENERATE_MAX 10000
+fauna* fauna_generate(world* w, unsigned int num);

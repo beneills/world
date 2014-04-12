@@ -1,74 +1,114 @@
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "generate.h"
 
-#include <math.h>
-// TODO why can't I get this from math.h?
-# define M_SQRT2	1.41421356237309504880	/* sqrt(2) */
-# define M_SQRT1_2	0.70710678118654752440	/* 1/sqrt(2) */
-# define M_PI		3.14159265358979323846	/* pi */
+// TODO delete
+/* # define M_SQRT2	1.41421356237309504880	/\* sqrt(2) *\/ */
+/* # define M_SQRT1_2	0.70710678118654752440	/\* 1/sqrt(2) *\/ */
+/* # define M_PI		3.14159265358979323846	/\* pi *\/ */
+
+// we try this many attempts per requested seed in seeds_generate
+#define GENERATE_MAX_GENERATE_ATTEMPTS_MULTIPLIER 10
 
 # define SQUARE(x) x*x
 
-#include "generate.h"
-#include "utility.h"
+bool meets_cutoff_basic(double p);
+bool open_node_basic(int x, int y);
+double initial_strength_basic();
+double derived_strength_basic(double parent_strength);
 
-
-void seed_generator() {
+// call ONCE to initilize PRNG
+void init_generator() {
   srand((unsigned) time(NULL));
 }
 
+// add a seed to end of list and return it
+// if head == NULL, we start a new list seamlessly
+// TODO test
+seed* seeds_add(seed* head,
+		unsigned int x,
+		unsigned int y,
+		double strength) {
+  seed* s = (seed *) SAFEMALLOC(sizeof(seed));
+  if ( head != NULL ) {
+    for ( ; head->next != NULL; head = head->next )
+      ;				/* intentionally blank */
+    head->next = s;
+  }
+
+  return s;
+}
+
+void seeds_free(seed* head) {
+  for ( seed* s = head; s != NULL;  head = s) {
+    s = head->next;
+    free(head);
+  }
+}
+
+// generate initial seeds, guaranteed to be within map bounds
+// may return fewer than n
 seed* seeds_generate(unsigned int width,
 		     unsigned int height,
 		     unsigned int n,
-		     double (*initial_strength)()) {
-  seed *c;
-  seed *h = NULL;
-  for (int i = 0; i < n; ++i) {
-    // TODO use seeds_add
-    c = (seed *) SAFEMALLOC(sizeof(seed));
+		     generation_parameters* params) {
+  seed *s, *head = NULL;
+  for (unsigned int i = 0;
+       i < n && i < GENERATE_MAX_GENERATE_ATTEMPTS_MULTIPLIER;
+       ) {
+    int x = (unsigned int) (uniform_random() * width);
+    int y = (unsigned int) (uniform_random() * height);
 
-    // TODO this possibly fails on edge case (literally)
-    c->x = (unsigned int) (uniform_random() * width);
-    c->y = (unsigned int) (uniform_random() * height);
-
-    c->strength = (* initial_strength)();
-    c->next = h;
-    h = c;
+    if ( (* params->open_node)(x, y) ) {
+      s = seeds_add(head,
+		    x,
+		    y,
+		    (* params->initial_strength)());
+      ++i;
+      if ( head == NULL ) { head = s; }
+    }
   }
 
-  return h;
+  return head;
 }
 
-seed* seeds_free(seed* s) {
-  for ( seed* c = s; c != NULL;  s = c) {
-    c = s->next;
-    free(s);
+// given an existing seed list, grow it according to params
+void seeds_grow(seed* head, generation_parameters* params) {
+  // while seed pool is non-empty, take a seed from the front and process it
+  // strength < 0 is used for an empty map square, but stops it being repeatedly
+  // considered
+  for ( seed* s = head;
+	s != NULL;
+	s = s->next ) {
+    // consider each of the 8 neighbours
+    for ( int x = -1; d_x < 2; ++d_x ) {
+      for ( int d_y = -1; d_y < 2; ++d_y ) {
+	int x = s->x + d_x;
+	int y = s->y + d_y;
+	if ( !seeds_contains(s, x, y) ) {
+	  double diagonal_multiplier = (d_x && d_y) ? 1.0 : M_SQRT2; /* cases diagonal and non-diagonal */
+	  double strength = (* params->meets_cutoff)(uniform_random() *
+						     s->strength *
+						     diagonal_multiplier)
+	    ? (* params->derived_strength)(s->strength) : -1.0;
+	  seeds_add(s, x, y, strength); /* add to end of list */
+	}
+      }
+    }
   }
 }
 
-void seeds_add(seed* s,
-	       unsigned int x,
-	       unsigned int y,
-	       double strength) {
-  for ( ; s->next != NULL;  s = s->next) {}
-
-  s->next = (seed *) SAFEMALLOC(sizeof(seed));
-  s->next->x = x;
-  s->next->y = y;
-  s->next->strength = strength;
-  s->next->next = NULL;
-}
-
-bool seeds_contains(seed* s,
+bool seeds_contains(seed* head,
 		    unsigned int x,
 		    unsigned int y) {
-  for ( ; s != NULL;  s = s->next) {
-    if (s->x == x && s->y == y) {
+  for ( ; head != NULL;  head = head->next) {
+    if (head->x == x && head->y == y) {
       return true;
     }
   }
   return false;
+}
+
+double initial_strength_unit() {
+  return 1.0;
 }
 
 bool meets_cutoff_basic(double p) {
@@ -78,6 +118,10 @@ bool meets_cutoff_basic(double p) {
   } else {
     return false;
   }
+}
+
+bool open_node_basic(int x, int y) {
+  return true;
 }
 
 // used for the very first (parentless) seeds
@@ -90,63 +134,4 @@ double derived_strength_basic(double parent_strength) {
   // TODO
   // return parent_strength * 0.7;
   return SQUARE(cos(parent_strength * M_PI / 2.0));
-}
-
-map* generate_random_map(unsigned int width,
-			 unsigned int height,
-			 unsigned int seeds,
-			 bool (*meets_cutoff)(double),
-			 double (*initial_strength)(),
-			 double (*derived_strength)(double)) {
-  // possibly use defaults
-  if ( meets_cutoff == NULL ) {
-    meets_cutoff = MEETS_CUTOFF_DEFAULT;
-  }
-  if ( initial_strength == NULL ) {
-    initial_strength = INITIAL_STRENGTH_DEFAULT;
-  }
-  if ( derived_strength == NULL ) {
-    derived_strength = DERIVED_STRENGTH_DEFAULT;
-  }
-
-
-  map* m = map_new(width, height);
-  seed* s = seeds_generate(width, height, seeds, initial_strength);
-
-  // while seed pool is non-empty, take a seed from the front and process it
-  // strength < 0 is used for an empty map square, but stops it being repeatedly
-  // considered
-  for ( seed* c = s;
-	c != NULL;
-	c = c->next ) {
-    // possibly add the seed to the map
-    if (c->strength > -1) {
-      map_element(m, c->x, c->y) = MAP_EL_IMPASSABLE;
-    }
-
-    // consider each of the 8 neighbours
-    for ( int d_x = -1; d_x < 2; ++d_x ) {
-      for ( int d_y = -1; d_y < 2; ++d_y ) {
-	int x = c->x + d_x;
-	int y = c->y + d_y;
-	// check that we're still on the map,
-	// but not already in the seed list
-	if ( !(d_x == 0 && d_y == 0) &&
-	     x >= 0 && x < width &&
-	     y >= 0 && y < height &&
-	     !seeds_contains(s, x, y) ) {
-	  // cases diagonal and non-diagonal
-	  double diagonal_multiplier = (d_x && d_y) ? 1.0 : M_SQRT2;
-	  double strength = (* meets_cutoff)(uniform_random() *
-					     c->strength *
-					     diagonal_multiplier)
-	    ? (* derived_strength)(c->strength) : -1.0;
-	  // add to pool
-	  seeds_add(c, (unsigned int) x, (unsigned int) y, strength);
-	}
-      }
-    }
-  }
-  seeds_free(s);
-  return m;
 }
