@@ -8,14 +8,11 @@ map* map_new(unsigned int width, unsigned int height) {
   map* m = (map *) SAFEMALLOC(sizeof(map));
   m->width = width;
   m->height = height;
-  m->data = (tile *) SAFEMALLOC(height * width * sizeof(tile));
-  memset(m->data, MAP_EL_EMPTY, height * width * sizeof(tile));
+  m->data = (char *) SAFECALLOC(height * width, sizeof(char)); /* NOTE we rely on MAP_EL_EMPTY == '\0' */
   return m;
 }
 
 void map_free(map* m) {
-  if (m->data) {
-    free(m->data);
-  }
+  free(m->data);
   free(m);
 }

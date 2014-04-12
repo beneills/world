@@ -6,10 +6,11 @@
 
 #define NODE_EQ(n1, n2) ((n1).x == (n2).x && (n1).y == (n2).y)
 
-#define map_element(m, x, y) m->data[y*m->width + x]
-#define map_valid(m, x, y) x >= 0 && x < m->width && y >= 0 && y < m->height
-
-typedef char tile;
+#define MAP_ELEMENT(m, x, y) m->data[y*m->width + x]
+#define MAP_NODE_VALID(m, x, y) (x) >= 0 && \
+    (x) < m->width && \
+    (y) >= 0 && \
+    (y) < m->height
 
 typedef struct node_s {
   unsigned int x, y;
@@ -18,7 +19,7 @@ typedef struct node_s {
 typedef struct {
   unsigned int width;
   unsigned int height;
-  tile* data;
+  char* data;
 } map;
 
 map* map_new(unsigned int width, unsigned int height);
