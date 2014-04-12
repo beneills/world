@@ -1,11 +1,10 @@
 #ifndef WORLD_H_INCLUDED
 #define WORLD_H_INCLUDED
 
-#include "map.h"
 #include "fauna.h"
+#include "map.h"
 
-// forward declaration TODO
-struct fauna_s; typedef struct fauna_s fauna;
+struct fauna_s; typedef struct fauna_s fauna; /* TODO forward declaration */
 
 typedef unsigned int time;
 
@@ -14,9 +13,7 @@ typedef struct {
   fauna* f; // linked list of fauna
 } world;
 
-int main(int argc, char** argv);
-
-world* world_new(map* m);
+world* world_new();
 void world_free(world* w);
 
 #endif

@@ -4,17 +4,15 @@
 #include "world.h"
 #include "utility.h"
 
-world* world_new(map* m) {
-  world* w = (world *) SAFEMALLOC(sizeof(world));
-  w->m = m;
-  w->f = NULL;
+// allocate a new world object
+world* world_new() {
+  world* w = (world *) SAFECALLOC(1, sizeof(world));
   return w;
 }
 
+// free a world and its contents
 void world_free(world* w) {
   map_free(w->m);
-  if (w->f != NULL) {
-    fauna_free(w->f);
-  }
+  fauna_free(w->f);
   free(w);
 }
