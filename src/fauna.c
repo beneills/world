@@ -77,3 +77,10 @@ fauna* fauna_at(fauna* search_start, node position) {
 	search_start = search_start->next ) {}
   return search_start;
 }
+
+// move the fauna to a node
+// NOTE there is no error checking: node must be valid
+// TODO test
+void fauna_move(fauna* f, node n) {
+  f->position = n;
+}
