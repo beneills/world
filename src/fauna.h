@@ -9,7 +9,7 @@ typedef struct {
 } gene_attributes;
 
 typedef struct {
-  wander_status* ws;
+  wander_status* wander;
 } status_attributes;
 
 typedef struct fauna_s {
