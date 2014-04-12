@@ -4,27 +4,49 @@
 #include "graphics.h"
 #include "map.h"
 #include "utility.h"
+#include "world.h"
 
-
+// return a string rendering of a world
+// TODO test
 char* world_render(world* w) {
-  map* m = w->m;
+   // count tiles, newlines and terminating NULL
+  char* output = (char *)
+    SAFECALLOC(w->m->height * (w->m->width + 1) + 1,
+	       sizeof(char));
 
-  // count tiles, newlines and terminating NULL
-  int bytes = m->height * (m->width + 1) + 1;
-  char* output = (char *) SAFECALLOC(bytes, sizeof(char));
 
-  int j = 0; // output string position
-  for ( unsigned int i = 0; i < m->height * m->width; ++i, ++j ) {
-    if (i > 0 && index_to_x(m, i) == 0) {
-      output[j] = '\n';
-      ++j;
-    }
-    if ( fauna_at(w->f, index_to_x(m, i), index_to_y(m, i)) ) {
-      output[j] = 'F';
-    } else {
-      output[j] = m->data[i] == MAP_EL_IMPASSABLE ? 'X' : ' ';
+  for ( unsigned int y = 0,
+	    unsigned int i;		/* buffer position */;
+	y < w->m->height;
+	++y ) {
+    for ( unsigned int x = 0;
+	  x < w->m->width;
+	  ++x, ++i ) {
+
+      // TODO there's gotta be a better way...
+      if ( output[i] = render_fauna_at_node(w->f, x, y) ) {
+      } else if ( output[i] = render_map_at_node(w->f, x, y) ) {
+      } else {
+	output[i] = GRAPHICS_MAP_EMPTY_CHAR;
+      }
+
+      // possibly add newline
+      if ( x % w->m->width == -1 ) {
+	output[i++] = '\n';
+      }
     }
   }
-  output[bytes-1] = '\0';
+  
+  // TODO manually set terminating null?
   return output;
+}
+
+char render_map_at_node(map* m, unsigned int x, unsigned int y) {
+  return MAP_ELEMENT(m, x, y) == MAP_EL_IMPASSABLE ?
+    GRAPHICS_MAP_IMPASSABLE_CHAR : '\0';
+}
+
+char render_fauna_at_node(fauna* f, unsigned int x, unsigned int y) {
+  return fauna_at(w->f, x, y) ?
+    GRAPHICS_FAUNA_CHAR : '\0';
 }
