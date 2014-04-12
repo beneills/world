@@ -50,3 +50,7 @@ char render_fauna_at_node(fauna* f, unsigned int x, unsigned int y) {
   return fauna_at(w->f, x, y) ?
     GRAPHICS_FAUNA_CHAR : '\0';
 }
+
+void clear_screen() {
+  printf("\e[1;1H\e[2J");
+}

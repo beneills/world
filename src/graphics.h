@@ -10,6 +10,7 @@
 char* world_render(world* w);
 char render_map_at_node(map* m, unsigned int x, unsigned int y);
 char render_fauna_at_node(fauna* f, unsigned int x, unsigned int y);
+void clear_screen();
 
 #endif
 
